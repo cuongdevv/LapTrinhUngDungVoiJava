@@ -1,5 +1,6 @@
 package vn.edu.gdu.springjpalab.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 
 import java.math.BigDecimal;
@@ -32,6 +33,8 @@ public class Student {
 
     // ── Quan hệ Nhiều-Nhiều (N-N) tới Course (Bài 3 - Chương 5) ──
     // Student là Owning Side -> cấu hình bảng trung gian "student_course".
+    // Bỏ qua "students" khi xuất JSON: quan hệ 2 chiều sẽ lặp vô hạn nếu serialize cả hai phía.
+    @JsonIgnoreProperties({"students"})
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(
             name = "student_course",                          // bảng liên kết trung gian

@@ -1,5 +1,6 @@
 package vn.edu.gdu.springjpalab.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -30,6 +31,10 @@ public class Product {
     // ── Quan hệ Nhiều-Một (N-1) tới Category (Bài 3 - Chương 5) ──
     // Product là Owning Side -> giữ cột khóa ngoại "category_id".
     // ManyToOne mặc định EAGER; ép LAZY để tránh N+1 query.
+    // Bỏ qua "products" khi xuất JSON: quan hệ 2 chiều sẽ lặp vô hạn nếu serialize cả hai phía.
+    // LAZY khiến Hibernate trả về proxy; "hibernateLazyInitializer"/"handler" là field nội bộ
+    // của proxy, Jackson không serialize được nên phải bỏ qua.
+    @JsonIgnoreProperties({"products", "hibernateLazyInitializer", "handler"})
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id")
     private Category category;
