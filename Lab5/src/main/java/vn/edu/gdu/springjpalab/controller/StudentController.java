@@ -1,10 +1,11 @@
 package vn.edu.gdu.springjpalab.controller;
 
-import org.springframework.boot.autoconfigure.graphql.GraphQlProperties;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import vn.edu.gdu.springjpalab.entity.Course;
 import vn.edu.gdu.springjpalab.entity.Student;
+import vn.edu.gdu.springjpalab.repository.CourseRepository;
 import vn.edu.gdu.springjpalab.repository.StudentRepository;
 
 import java.util.List;
@@ -15,9 +16,11 @@ import java.util.Optional;
 
 public class StudentController {
     private final StudentRepository studentRepository;
+    private final CourseRepository courseRepository;
 
-    public StudentController(StudentRepository studentRepository) {
+    public StudentController(StudentRepository studentRepository, CourseRepository courseRepository) {
         this.studentRepository = studentRepository;
+        this.courseRepository = courseRepository;
     }
 
     @GetMapping
@@ -65,6 +68,28 @@ public class StudentController {
     @GetMapping("/count")
     public long count() {
         return studentRepository.count();
+    }
+
+    // ── Đăng ký sinh viên vào một môn học (Bài tập về nhà - Chương 5) ──
+    // Ghi dữ liệu vào bảng trung gian "student_course" qua quan hệ N-N.
+    @PostMapping("/{studentId}/enroll/{courseId}")
+    public ResponseEntity<?> enroll(@PathVariable Long studentId, @PathVariable Long courseId) {
+        Optional<Student> studentOpt = studentRepository.findById(studentId);
+        if (studentOpt.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("Không tìm thấy sinh viên ID: " + studentId);
+        }
+
+        Optional<Course> courseOpt = courseRepository.findById(courseId);
+        if (courseOpt.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("Không tìm thấy môn học ID: " + courseId);
+        }
+
+        Student student = studentOpt.get();
+        // Hàm tiện ích tự đồng bộ liên kết hai chiều trước khi lưu.
+        student.enrollInCourse(courseOpt.get());
+        return ResponseEntity.ok(studentRepository.save(student));
     }
 }
 
