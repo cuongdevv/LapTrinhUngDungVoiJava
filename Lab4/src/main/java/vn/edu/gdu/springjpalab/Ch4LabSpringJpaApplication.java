@@ -3,9 +3,6 @@ package vn.edu.gdu.springjpalab;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-/**
- * Điểm khởi động ứng dụng Spring Boot cho Lab 4 - Spring Data JPA.
- */
 @SpringBootApplication
 public class Ch4LabSpringJpaApplication {
 
